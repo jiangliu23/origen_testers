@@ -4,17 +4,26 @@ module OrigenTesters
       class TestMethods
         class Limits
           attr_reader :test_method
+          attr_reader :id
           attr_accessor :lo_limit, :hi_limit
           attr_accessor :unit
           attr_accessor :tnum
+          attr_accessor :include_in_tf
           alias_method :lo, :lo_limit
           alias_method :lo=, :lo_limit=
           alias_method :hi, :hi_limit
           alias_method :hi=, :hi_limit=
 
-          def initialize(test_method)
+          def initialize(test_method, options = {})
             @test_method = test_method
             @tnum = ''
+            @include_in_tf = true
+            @id = options[:id]
+
+            unit=(options[:unit]) if options[:unit]
+            set_lo_limit(options[:lo_limit]) if options[:lo_limit]
+            set_hi_limit(options[:hi_limit]) if options[:hi_limit]
+            @tnum = options[:tnum] if options[:tnum]
           end
 
           def unit=(val)
@@ -63,12 +72,18 @@ module OrigenTesters
             r
           end
 
+          def include_in_tf?
+            @include_in_tf
+          end
+
           private
 
           def test_name
-            if test_method.limits_id.nil?
+            if test_method.limits_id.nil? && @id.nil?
               name = test_method.try(:test_name) || test_method.try(:_test_name) || test_method.try('TestName')
               name || 'Functional'
+            elsif test_method.limits_id.nil?
+              @id
             else
               test_method.limits_id
             end

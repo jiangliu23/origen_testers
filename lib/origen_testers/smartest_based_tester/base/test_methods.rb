@@ -10,6 +10,8 @@ module OrigenTesters
         autoload :AcTml, 'origen_testers/smartest_based_tester/base/test_methods/ac_tml'
         autoload :DcTml, 'origen_testers/smartest_based_tester/base/test_methods/dc_tml'
         autoload :CustomTml, 'origen_testers/smartest_based_tester/base/test_methods/custom_tml'
+        autoload :MultiGroupDcTml, 'origen_testers/smartest_based_tester/base/test_methods/multi_group_dc_tml'
+        autoload :ScanTml, 'origen_testers/smartest_based_tester/base/test_methods/scan_tml'
 
         attr_accessor :flow, :collection
 
@@ -41,6 +43,16 @@ module OrigenTesters
         # Returns the DC test method library
         def dc_tml
           @dc_tml ||= DcTml.new(self)
+        end
+
+        # Returns the Multi-Group DC test method library
+        def multi_group_dc_tml
+          @multi_group_dc_tml ||= MultiGroupDcTml.new(self)
+        end
+
+        # Returns the Scan test method library
+        def scan_tml
+          @scan_tml ||= ScanTml.new(self)
         end
 
         # Creates an accessor for custom test method libraries the first time they are called

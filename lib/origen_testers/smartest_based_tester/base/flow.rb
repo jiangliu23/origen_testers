@@ -8,7 +8,7 @@ module OrigenTesters
         # Returns an array containing all runtime variables which get set by the flow
         attr_reader :set_runtime_variables
 
-        attr_accessor :add_flow_enable, :flow_name
+        attr_accessor :add_flow_enable, :flow_name, :flow_description
 
         def var_filename
           @var_filename || 'global'
@@ -24,6 +24,10 @@ module OrigenTesters
 
         def flow_name
           @flow_name || filename.sub(/\..*/, '').upcase
+        end
+
+        def flow_description
+          @flow_description || '' 
         end
 
         def hardware_bin_descriptions
@@ -82,7 +86,7 @@ module OrigenTesters
             f << '  }'
           end
           f << ''
-          f << "  }, open,\"#{flow_name}\",\"\""
+          f << "  }, open,\"#{flow_name}\",\"#{flow_description}\""
           f
         end
 
@@ -109,7 +113,7 @@ module OrigenTesters
         end
 
         def line(str)
-          @lines << ('  ' * @indent) + str
+          @lines << '    ' + ('   ' * (@indent-1)) + str
         end
 
         # def on_flow(node)
@@ -119,6 +123,18 @@ module OrigenTesters
         #  @indent -= 1
         #  line "}, open,\"#{unique_group_name(node.find(:name).value)}\", \"\""
         # end
+
+        def on_if_var(node)
+          #puts 'PPPPPPPPPPPPP made it here PPPPPPPPPPPPPPPP'
+          #puts node
+          flag, *nodes = *node
+          state = node.type == :if_var
+          #[flag].flatten.each do |f|
+          #  flow_control_variables << generate_flag_name(f)
+          #end
+          on_condition_flag(node, state)
+        end
+        alias_method :on_unless_var, :on_if_var
 
         def on_test(node)
           test_suite = node.find(:object).to_a[0]
@@ -212,7 +228,15 @@ module OrigenTesters
           flag, *nodes = *node
           else_node = node.find(:else)
           if flag.is_a?(Array)
-            condition = flag.map { |f| "@#{generate_flag_name(f)} == 1" }.join(' or ')
+            if flag[0].is_a?(Hash)
+              condition = ""
+              flag.each_with_index do |var_val, idx|
+                condition += "@#{generate_flag_name(var_val.flatten[0])} == \"#{var_val.flatten[1]}\""
+                condition += ' or ' if idx < (flag.size - 1)
+              end 
+            else
+              condition = flag.map { |f| "@#{generate_flag_name(f)} == 1" }.join(' or ')
+            end
           else
             condition = "@#{generate_flag_name(flag)} == 1"
           end
@@ -327,17 +351,23 @@ module OrigenTesters
           desc = node.find(:bin).to_a[1]
           sbin = node.find(:softbin).try(:value)
           sdesc = node.find(:softbin).to_a[1] || 'fail'
+          overon = (node.find(:not_over_on).try(:value) == true) ? 'not_over_on' : 'over_on'
+          multi_bin = (node.find(:multi_bin).try(:value) == true) ? true : false
           if bin && desc
             hardware_bin_descriptions[bin] ||= desc
           end
 
           if node.to_a[0] == 'pass'
-            line "stop_bin \"#{sbin}\", \"\", , good, noreprobe, green, #{bin}, over_on;"
+            line "stop_bin \"#{sbin}\", \"\", , good, noreprobe, green, #{bin}, #{overon};"
           else
             if tester.create_limits_file
               line 'multi_bin;'
             else
-              line "stop_bin \"#{sbin}\", \"#{sdesc}\", , bad, noreprobe, red, #{bin}, over_on;"
+              if multi_bin
+                line 'multi_bin;'
+              else
+                line "stop_bin \"#{sbin}\", \"#{sdesc}\", , bad, noreprobe, red, #{bin}, #{overon};"
+              end
             end
           end
         end

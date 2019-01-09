@@ -53,7 +53,7 @@ module OrigenTesters
               'UseDCScaleSIG.testName'           => [:string, ''],
               'output'                           => [:string, 'None', %w(None ReportUI ShowFailOnly)]
             },
-            leakage: {
+            leakage:    {
               'UsePPMU'                           => [:string, 'NO', %w(NO YES)],
               'UsePPMU.pinlist'                   => [:string, ''],
               'UsePPMU.measure'                   => [:string, 'BOTH', %w(LOW HIGH BOTH)],
@@ -62,7 +62,7 @@ module OrigenTesters
               'UsePPMU.prechargeVoltage_mV'       => [:string, '(0.0, 0.0)'],
               'UsePPMU.settlingTime_ms'           => [:string, '(1.0,1.2)'],
               'UsePPMU.measureMode'               => [:string, 'PAR', %w(PAR SER)],
-              'UsePPMU.relaySwitchMode'           => [:string, 'DEFAULT(BBM)', ['DEFAULT(BBM)','MBB','PARALLEL']],
+              'UsePPMU.relaySwitchMode'           => [:string, 'DEFAULT(BBM)', ['DEFAULT(BBM)', 'MBB', 'PARALLEL']],
               'UsePPMU.testName'                  => [:string, ''],
               'UseSPMU'                           => [:string, 'NO', %w(NO YES)],
               'UseSPMU.pinlist'                   => [:string, ''],
@@ -73,7 +73,7 @@ module OrigenTesters
               'UseSPMU.clampCurrent_uA'           => [:string, '(100,300)'],
               'UseSPMU.settlingTime_ms'           => [:string, '(1.0,1.2)'],
               'UseSPMU.measureMode'               => [:string, 'PAR', %w(PAR SER)],
-              'UseSPMU.relaySwitchMode'           => [:string, 'NTBBM',%w(NTBBM NTMBB)],
+              'UseSPMU.relaySwitchMode'           => [:string, 'NTBBM', %w(NTBBM NTMBB)],
               'UseSPMU.testName'                  => [:string, ''],
               'UseMCX-PMU'                        => [:string, 'NO', %w(NO YES)],
               'UseMCX-PMU.pinlist'                => [:string, ''],
@@ -93,7 +93,7 @@ module OrigenTesters
               'UseDcScaleSIG.clampCurrent_uA'     => [:string, '(100,300)'],
               'UseDcScaleSIG.settlingTime_ms'     => [:string, '(1.0,1.2)'],
               'UseDcScaleSIG.measureMode'         => [:string, 'PAR', %w(PAR SER)],
-              'UseDcScaleSIG.relaySwitchMode'     => [:string, 'NO',%w(NO NT)],
+              'UseDcScaleSIG.relaySwitchMode'     => [:string, 'NO', %w(NO NT)],
               'UseDcScaleSIG.testName'            => [:string, ''],
               'preFunction'                       => [:string, 'NO', %w(NO YES)],
               'preFunction.testName'              => [:string, ''],
@@ -104,7 +104,7 @@ module OrigenTesters
               'stopVecHigh'                       => [:string, '0'],
               'stopVecLow'                        => [:string, '0'],
 
-              multi_limits: [{ id: 'PreFunctionalTest' },{ id: 'PreFunctionalTest_High' },{ id: 'PreFunctionalTest_Low' }]
+              multi_limits: [{ id: 'PreFunctionalTest' }, { id: 'PreFunctionalTest_High' }, { id: 'PreFunctionalTest_Low' }]
             }
           }
 

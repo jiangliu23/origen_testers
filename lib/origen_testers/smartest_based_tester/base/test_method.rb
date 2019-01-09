@@ -32,7 +32,7 @@ module OrigenTesters
           defined_multi_limits = options[:methods].delete(:multi_limits)
           unless defined_multi_limits.nil?
             defined_multi_limits.each do |limit_opts|
-              self.add_limit(limit_opts)
+              add_limit(limit_opts)
             end
           end
 

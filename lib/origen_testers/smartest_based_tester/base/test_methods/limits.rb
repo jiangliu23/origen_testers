@@ -20,7 +20,7 @@ module OrigenTesters
             @include_in_tf = true
             @id = options[:id]
 
-            unit=(options[:unit]) if options[:unit]
+            unit = (options[:unit]) if options[:unit]
             set_lo_limit(options[:lo_limit]) if options[:lo_limit]
             set_hi_limit(options[:hi_limit]) if options[:hi_limit]
             @tnum = options[:tnum] if options[:tnum]

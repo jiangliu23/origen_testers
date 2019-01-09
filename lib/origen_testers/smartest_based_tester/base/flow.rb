@@ -27,7 +27,7 @@ module OrigenTesters
         end
 
         def flow_description
-          @flow_description || '' 
+          @flow_description || ''
         end
 
         def hardware_bin_descriptions
@@ -113,7 +113,7 @@ module OrigenTesters
         end
 
         def line(str)
-          @lines << '    ' + ('   ' * (@indent-1)) + str
+          @lines << '    ' + ('   ' * (@indent - 1)) + str
         end
 
         # def on_flow(node)
@@ -125,13 +125,11 @@ module OrigenTesters
         # end
 
         def on_if_var(node)
-          #puts 'PPPPPPPPPPPPP made it here PPPPPPPPPPPPPPPP'
-          #puts node
           flag, *nodes = *node
           state = node.type == :if_var
-          #[flag].flatten.each do |f|
-          #  flow_control_variables << generate_flag_name(f)
-          #end
+          flag.each do |f|
+            runtime_control_variables << [generate_flag_name(f.flatten[0].to_s), f.flatten[1]]
+          end
           on_condition_flag(node, state)
         end
         alias_method :on_unless_var, :on_if_var
@@ -229,11 +227,11 @@ module OrigenTesters
           else_node = node.find(:else)
           if flag.is_a?(Array)
             if flag[0].is_a?(Hash)
-              condition = ""
+              condition = ''
               flag.each_with_index do |var_val, idx|
                 condition += "@#{generate_flag_name(var_val.flatten[0])} == \"#{var_val.flatten[1]}\""
                 condition += ' or ' if idx < (flag.size - 1)
-              end 
+              end
             else
               condition = flag.map { |f| "@#{generate_flag_name(f)} == 1" }.join(' or ')
             end
@@ -283,13 +281,13 @@ module OrigenTesters
         alias_method :on_unless_flag, :on_if_flag
 
         def on_enable(node)
-          flag = node.value.upcase
+          flag = generate_flag_name(node.value)
           flow_control_variables << flag
           line "@#{flag} = 1;"
         end
 
         def on_disable(node)
-          flag = node.value.upcase
+          flag = generate_flag_name(node.value)
           flow_control_variables << flag
           line "@#{flag} = 0;"
         end

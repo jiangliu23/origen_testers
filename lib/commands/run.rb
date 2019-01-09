@@ -9,7 +9,8 @@ Run (execute a flow) of the last test program generated for the given target.
 
 Usage: origen testers:run FLOW [options]
   EOT
-  opts.on('--enable FLAG,FLAG', Array, 'Comma-separated list of flow flags to enable') { |flags| options[:flow_flags] = flags }
+  opts.on('--enable FLAG,FLAG', Array, 'Comma-separated list of flow flags to enable') { |flags| options[:enables] = flags }
+  opts.on('--variable VARIABLE1,VALUE1,VARIABLE2,VALUE2', Array, 'Comma-separated list of variable/value couplets') { |flags| options[:variables] = flags }
   opts.on('--job NAME', String, 'Job name to enable') { |job| options[:job] = job }
   opts.on('--fail ID,ID', Array, 'Comma-separated list of test IDs to fail') { |ids| options[:failed_test_ids] = ids }
   opts.on('-e', '--environment NAME', String, 'Override the default environment, NAME can be a full path or a fragment of an environment file name') { |e| options[:environment] = e }

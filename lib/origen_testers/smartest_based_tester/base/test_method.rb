@@ -64,6 +64,7 @@ module OrigenTesters
                   instance_variable_get("@#{clean_attr}")
                 end
               end
+              instance_variable_set("@#{clean_attr}__default_", default)
               send("#{clean_attr}=", default)
             end
           end
@@ -114,6 +115,13 @@ module OrigenTesters
           else
             fail "Unknown type for attribute #{attr}: #{type}"
           end
+        end
+
+        def default_val?(attr)
+          clean_attr = clean_attr_name(attr)
+          val = send(clean_attr) 
+          default_val = instance_variable_get("@#{clean_attr}__default_")
+          return val == default_val
         end
 
         def klass

@@ -113,7 +113,9 @@ testmethodparameters
 <%= method.id %>:
 %         method.sorted_parameters.each do |param|
 %           name = param[0]
+%           unless options[:dry] && method.default_val?(name)
   "<%= name.is_a?(String) ? name : name.to_s[0] == '_' ? name.to_s.camelize(:upper) : name.to_s.camelize(:lower) %>" = "<%= method.format(name) %>";
+%           end
 %         end
 %       end
 %     end

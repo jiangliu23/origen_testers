@@ -17,6 +17,7 @@ module OrigenTesters
         attr_accessor :abs_class_name
         attr_reader :limits
         attr_accessor :limits_id
+        attr_reader :multi_limits
 
         def initialize(options)
           @type = options[:type]
@@ -25,6 +26,16 @@ module OrigenTesters
           @parameters = {}
           @limits_id = options[:methods].delete(:limits_id)
           @limits = TestMethods::Limits.new(self)
+          @limits.render = false if options[:methods].delete(:render_limits_in_tf) == false
+
+          @multi_limits = []
+          defined_multi_limits = options[:methods].delete(:multi_limits)
+          unless defined_multi_limits.nil?
+            defined_multi_limits.each do |limit_opts|
+              add_limit(limit_opts)
+            end
+          end
+
           # Add any methods
           if options[:methods][:methods]
             methods = options[:methods][:methods]
@@ -82,6 +93,10 @@ module OrigenTesters
           options[:attrs].each do |k, v|
             send("#{k}=", v) if respond_to?("#{k}=")
           end
+        end
+
+        def add_limit(options = {})
+          @multi_limits.push(TestMethods::Limits.new(self, options))
         end
 
         def format(attr)

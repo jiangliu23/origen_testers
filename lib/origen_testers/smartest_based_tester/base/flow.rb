@@ -4,6 +4,15 @@ module OrigenTesters
       class Flow < ATP::Formatter
         include OrigenTesters::Flow
 
+        RELATIONAL_OPERATOR_STRINGS = {
+          eq: '==',
+          ne: '!=',
+          gt: '>',
+          ge: '>=',
+          lt: '<',
+          le: '<='
+        }
+
         attr_accessor :test_suites, :test_methods, :lines, :stack, :var_filename
         # Returns an array containing all runtime variables which get set by the flow
         attr_reader :set_runtime_variables
@@ -261,6 +270,70 @@ module OrigenTesters
           on_condition_flag(node, state)
         end
         alias_method :on_unless_flag, :on_if_flag
+
+        def on_if_true(node)
+          expressions, *nodes = *node
+          state = node.type == :if_true
+
+          if expressions.is_a?(Array)
+            condition = expressions.map { |e| "#{generate_expression_string(e)}" }.join(' and ')
+          else
+            condition = "#{generate_expression_string(expressions)}"
+          end
+
+          line "if #{condition} then"
+          line '{'
+          @indent += 1
+          if state
+            process_all(node.children)
+          end
+          @indent -= 1
+          line '}'
+          line 'else'
+          line '{'
+          @indent += 1
+          unless state
+            process_all(node.children)
+          end
+          @indent -= 1
+          line '}'
+        end
+        alias_method :on_if_false, :on_if_true
+
+        def generate_expression_string(node, options = {})
+          return node unless node.respond_to?(:type)
+          case node.type
+          when :eq, :ne, :gt, :ge, :lt, :le
+            result = "#{generate_expr_term(node.to_a[0])} #{RELATIONAL_OPERATOR_STRINGS[node.type]} #{generate_expr_term(node.to_a[1])}"
+            result
+          when :or
+            result = node.to_a.map { |e_or| "#{generate_expression_string(e_or)}" }.join(' or ')
+            puts result
+            result
+          when :and
+            result = node.to_a.map { |e_and| "#{generate_expression_string(e_and)}" }.join(' and ')
+            puts result
+            result
+          when :expr
+            fail 'This should not happen, all :expr nodes should have been converted to relational nodes'
+          else
+            fail "Relational operator '#{node.type}' not  supported"
+          end
+        end
+
+        def generate_expr_term(val)
+          return val if val.is_a?(Fixnum) || val.is_a?(Integer) || val.is_a?(Float)
+          case val[0]
+          when '$'
+            "@#{val[1..-1]}"
+          else
+            if val.is_a? String
+              "\"#{val}\""
+            else
+              val
+            end
+          end
+        end
 
         def on_enable(node)
           flag = node.value.upcase

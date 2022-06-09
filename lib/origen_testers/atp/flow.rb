@@ -415,6 +415,10 @@ module OrigenTesters::ATP
             children << n(:force_value, [options[:force_value]])
           end  
 
+          if options[:units]
+            children << n(:units, [options[:units]])
+          end  
+
           if options[:test_text]
             children << n(:test_text, [options[:test_text]])
           end
